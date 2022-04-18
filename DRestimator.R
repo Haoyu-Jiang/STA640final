@@ -1,6 +1,6 @@
 # Doubly Robust Estimator
 # X: the binary (0-1) treatment of interest! dimension n*1
-# Y: binary outcome (0-1), dimension n*1
+# Y: continuous outcome, dimension n*1
 # Z: confounders, dimension n*p, all of them are continuous or 0-1 binary
 # For the potential outcome models, we refered to codes provided by Prof. Fan Li
 DR.estimator <- function(X, Y, Z){
