@@ -18,16 +18,15 @@ DR.estimator <- function(X, Y, Z){
 }
 
 # simple example
-set.seed(123)
-n <- 10000
+set.seed(12345)
+n <- 1000
 Z <- matrix(rnorm(n * 3), nrow = n)
 beta.ps <- as.matrix(c(1, 2, 3))
 ps <- exp(Z %*% beta.ps) / (1 + exp(Z %*% beta.ps))
 X <- rbinom(n, 1, prob = ps)
 
-beta.Y <- as.matrix(c(0, 1, 0, -2)) # true causal effect = 0
-Y.prob <- exp(cbind(X, Z) %*% beta.Y) / (1 + exp(cbind(X, Z) %*% beta.Y))
-Y <- rbinom(n, 1, prob = Y.prob)
+beta.Y <- as.matrix(c(3, 1, 0, -2)) # true causal effect = 3
+Y <- cbind(X, Z) %*% beta.Y + 0.5 * rnorm(n)
 
 DR.estimator(X, Y, Z)
 
