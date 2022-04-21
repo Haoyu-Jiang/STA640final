@@ -3,13 +3,13 @@
 # Y: continuous outcome, dimension n*1
 # Z: confounders, dimension n*p, all of them are continuous or 0-1 binary
 # For the potential outcome models, we refered to codes provided by Prof. Fan Li
-DR.estimator <- function(X, Y, Z){
+DR.estimator <- function(X, Y, Z, PS.Zid, OR.Zid){
   # use logistic regression to estimate propensity score
-  pscore <- glm(X ~ Z, family = "binomial")$fitted.values
+  pscore <- glm(X ~ Z[, PS.Zid], family = "binomial")$fitted.values
   
   # use logistic regression to predict potential outcomes
-  m1 <- glm(Y ~ Z, weights = X, family = "gaussian")$fitted.values
-  m0 <- glm(Y ~ Z, weights = (1 - X), family = "gaussian")$fitted.values
+  m1 <- glm(Y ~ Z[, OR.Zid], weights = X, family = "gaussian")$fitted.values
+  m0 <- glm(Y ~ Z[, OR.Zid], weights = (1 - X), family = "gaussian")$fitted.values
   
   # doubly robost estimator
   tau.hat <- mean(m1 + X * (Y - m1) / pscore) - mean(m0 + (1 - X) * (Y - m0) / (1 - pscore))
@@ -28,7 +28,7 @@ X <- rbinom(n, 1, prob = ps)
 beta.Y <- as.matrix(c(3, 1, 0, -2)) # true causal effect = 3
 Y <- cbind(X, Z) %*% beta.Y + 0.5 * rnorm(n)
 
-DR.estimator(X, Y, Z)
+DR.estimator(X, Y, Z, PS.Zid = c(1:3), OR.Zid = c(1:3))
 
 
 
