@@ -6,7 +6,8 @@ data_generation <- function(cohorts = 1000, n, SEED = 1){
   set.seed(seed = SEED)
   data <- list()
   for (i in 1:cohorts){
-    Z1 <- Z2 <- rnorm(n, mean = 0, sd = 1)
+    Z1 <- rnorm(n, mean = 0, sd = 1)
+    Z2 <- rnorm(n, mean = 0, sd = 1)
     Z3 <- ifelse(runif(n) <= 0.3, 1, 0)
     # we use true model to generate x
     beta0 <- 1.5
