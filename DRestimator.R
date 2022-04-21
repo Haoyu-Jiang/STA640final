@@ -60,7 +60,12 @@ simu <- function(cohorts = 1000, n, PS.Zid, OR.Zid){
   # taus: store 1000 tau.dr estimates at each cohort
   taus <- rep(NA, cohorts)
   SE_ACMs <- rep(NA, cohorts)
+  percentile.cover <- rep(NA, cohorts)
+  SEACM.cover <- rep(NA, cohorts)
+  SESD.cover <- rep(NA, cohorts)
+  
   for (i in 1:cohorts){
+    print(i)
     res <- DR.estimator(X = as.matrix(mydata[[i]][, "X"]),
                             Y = as.matrix(mydata[[i]][, "Y"]),
                             Z = as.matrix(mydata[[i]][, c("Z1", "Z2", "Z3")]),
@@ -68,15 +73,40 @@ simu <- function(cohorts = 1000, n, PS.Zid, OR.Zid){
                             OR.Zid = OR.Zid)
     taus[i] <- res[1]
     SE_ACMs[i] <- res[2]
+    
+    bsize <- 100 # bootstrap times
+    taus.boot <- rep(NA, bsize)
+    for (j in 1:bsize){
+      idx <- sample(n, replace = TRUE)
+      res.boot <- DR.estimator(X = as.matrix(mydata[[i]][idx, "X"]),
+                          Y = as.matrix(mydata[[i]][idx, "Y"]),
+                          Z = as.matrix(mydata[[i]][idx, c("Z1", "Z2", "Z3")]),
+                          PS.Zid = PS.Zid,
+                          OR.Zid = OR.Zid)
+      taus.boot[j] <- res.boot[1]
+    }
+    
+    CI.percentile <- quantile(taus.boot, c(0.025, 0.975))
+    percentile.cover[i] <- (CI.percentile[1] < 0 & 0 < CI.percentile[2])
+    
+    SEACM.cover[i] <- (taus[i] - 1.96 * SE_ACMs[i] < 0 & 0 < taus[i] + 1.96 * SE_ACMs[i])
+    SESD.cover[i] <- (taus[i] - 1.96 * sd(taus.boot)< 0 & 0 < taus[i] + 1.96 * sd(taus.boot))
+    
   }
   Bias <- mean(taus)
   SE_ACM <- mean(SE_ACMs)
   SD <- sd(taus)
+  ratio = SE_ACM / SD
   
-  return (c(Bias, SE_ACM, SD))
+  return (c(Bias, SE_ACM, SD, mean(percentile.cover), mean(SEACM.cover), mean(SESD.cover)))
 }
 
-simu(cohorts = 1000, n = 1000, PS.Zid = c(1:3), OR.Zid = c(1, 3))
+simu(cohorts = 1000, n = 100, PS.Zid = c(1:3), OR.Zid = c(1, 3))
+
+
+
+
+
 
 # simple example
 set.seed(12345)
