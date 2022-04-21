@@ -97,16 +97,47 @@ simu <- function(cohorts = 1000, n, PS.Zid, OR.Zid){
   SE_ACM <- mean(SE_ACMs)
   SD <- sd(taus)
   ratio = SE_ACM / SD
+  SE_ACM_Coverage <- mean(SEACM.cover)
+  SE_SD_Coverage <- mean(SESD.cover)
+  Percentile_Coverage <- mean(percentile.cover)
+  SE_ACM_Coverage_CI <- c((2 * cohorts * SE_ACM_Coverage + 1.96^2 - 1.96 * sqrt(1.96^2 + 4 * cohorts * SE_ACM_Coverage * (1 - SE_ACM_Coverage))) / (2 * (cohorts + 1.96^2)), 
+                          (2 * cohorts * SE_ACM_Coverage + 1.96^2 + 1.96 * sqrt(1.96^2 + 4 * cohorts * SE_ACM_Coverage * (1 - SE_ACM_Coverage))) / (2 * (cohorts + 1.96^2)))
+  SE_SD_Coverage_CI <- c((2 * cohorts * SE_SD_Coverage + 1.96^2 - 1.96 * sqrt(1.96^2 + 4 * cohorts * SE_SD_Coverage * (1 - SE_SD_Coverage))) / (2 * (cohorts + 1.96^2)), 
+                          (2 * cohorts * SE_SD_Coverage + 1.96^2 + 1.96 * sqrt(1.96^2 + 4 * cohorts * SE_SD_Coverage * (1 - SE_SD_Coverage))) / (2 * (cohorts + 1.96^2)))
+  Percentile_Coverage_CI <- c((2 * cohorts * Percentile_Coverage + 1.96^2 - 1.96 * sqrt(1.96^2 + 4 * cohorts * Percentile_Coverage * (1 - Percentile_Coverage))) / (2 * (cohorts + 1.96^2)), 
+                          (2 * cohorts * Percentile_Coverage + 1.96^2 + 1.96 * sqrt(1.96^2 + 4 * cohorts * Percentile_Coverage * (1 - Percentile_Coverage))) / (2 * (cohorts + 1.96^2)))
   
-  return (c(Bias, SE_ACM, SD, mean(percentile.cover), mean(SEACM.cover), mean(SESD.cover)))
+  return (c(Bias, SE_ACM, SD, ratio, SE_ACM_Coverage, SE_ACM_Coverage_CI, SE_SD_Coverage, SE_SD_Coverage_CI, Percentile_Coverage, Percentile_Coverage_CI))
 }
 
-simu(cohorts = 1000, n = 100, PS.Zid = c(1:3), OR.Zid = c(1, 3))
+ttt <- simu(cohorts = 1000, n = 100, PS.Zid = c(1:3), OR.Zid = c(1, 3))
 
+# scenario 1
+res1.df <- data.frame()
+for (n in c(100, 500, 1000, 2000)){
+  res1.df <- rbind(
+    res1.df,
+    c(n, simu(cohorts = 1000, n = n, PS.Zid = c(1:3), OR.Zid = c(1, 3)))
+  )
+}
 
+# scenario 2
+res2.df <- data.frame()
+for (n in c(100, 500, 1000, 2000)){
+  res2.df <- rbind(
+    res2.df,
+    c(n, simu(cohorts = 1000, n = n, PS.Zid = c(1), OR.Zid = c(1, 3)))
+  )
+}
 
-
-
+# scenario 3
+res3.df <- data.frame()
+for (n in c(100, 500, 1000, 2000)){
+  res3.df <- rbind(
+    res3.df,
+    c(n, simu(cohorts = 1000, n = n, PS.Zid = c(1:3), OR.Zid = c(1)))
+  )
+}
 
 # simple example
 set.seed(12345)
