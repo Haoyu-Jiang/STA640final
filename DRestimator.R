@@ -65,7 +65,9 @@ simu <- function(cohorts = 1000, n, PS.Zid, OR.Zid){
   SESD.cover <- rep(NA, cohorts)
   
   for (i in 1:cohorts){
-    print(i)
+    if (i %% 100 == 0){
+      print(i)
+    }
     res <- DR.estimator(X = as.matrix(mydata[[i]][, "X"]),
                             Y = as.matrix(mydata[[i]][, "Y"]),
                             Z = as.matrix(mydata[[i]][, c("Z1", "Z2", "Z3")]),
@@ -74,7 +76,7 @@ simu <- function(cohorts = 1000, n, PS.Zid, OR.Zid){
     taus[i] <- res[1]
     SE_ACMs[i] <- res[2]
     
-    bsize <- 100 # bootstrap times
+    bsize <- 1000 # bootstrap times
     taus.boot <- rep(NA, bsize)
     for (j in 1:bsize){
       idx <- sample(n, replace = TRUE)
