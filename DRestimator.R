@@ -123,6 +123,8 @@ for (n in c(100, 500, 1000, 2000)){
   )
 }
 
+save(res1.df, file = "res1.df.RData")
+
 # scenario 2
 res2.df <- data.frame()
 for (n in c(100, 500, 1000, 2000)){
