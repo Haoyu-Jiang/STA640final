@@ -142,6 +142,7 @@ for (n in c(100, 500, 1000, 2000)){
     c(n, simu(cohorts = 1000, n = n, PS.Zid = c(1:3), OR.Zid = c(1)))
   )
 }
+save(res3.df, file = "res3.df.RData")
 
 # simple example
 set.seed(12345)
