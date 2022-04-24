@@ -112,8 +112,6 @@ simu <- function(cohorts = 1000, n, PS.Zid, OR.Zid){
   return (c(Bias, SE_ACM, SD, ratio, SE_ACM_Coverage, SE_ACM_Coverage_CI, SE_SD_Coverage, SE_SD_Coverage_CI, Percentile_Coverage, Percentile_Coverage_CI))
 }
 
-ttt <- simu(cohorts = 1000, n = 100, PS.Zid = c(1:3), OR.Zid = c(1, 3))
-
 # scenario 1
 res1.df <- data.frame()
 for (n in c(100, 500, 1000, 2000)){
@@ -130,7 +128,7 @@ res2.df <- data.frame()
 for (n in c(100, 500, 1000, 2000)){
   res2.df <- rbind(
     res2.df,
-    c(n, simu(cohorts = 1000, n = n, PS.Zid = c(1), OR.Zid = c(1, 3)))
+    c(n, simu(cohorts = 100, n = n, PS.Zid = c(1), OR.Zid = c(1, 3)))
   )
 }
 
@@ -144,28 +142,4 @@ for (n in c(100, 500, 1000, 2000)){
 }
 save(res3.df, file = "res3.df.RData")
 
-# simple example
-set.seed(12345)
-
-tmp <- rep(NA, 1000)
-for (i in 1:1000){
-  n <- 1000
-  Z <- matrix(rnorm(n * 3), nrow = n)
-  beta.ps <- as.matrix(c(1, 2, 3))
-  ps <- exp(Z %*% beta.ps) / (1 + exp(Z %*% beta.ps))
-  X <- rbinom(n, 1, prob = ps)
-  
-  beta.Y <- as.matrix(c(3, 1, 0, -2)) # true causal effect = 3
-  Y <- cbind(X, Z) %*% beta.Y + 0.5 * rnorm(n)
-  
-  tmp[i] <- DR.estimator(X, Y, Z, PS.Zid = c(1:3), OR.Zid = c(1, 3))[1]
-}
-
-mean(tmp)
-
-
-df <- data.frame(Y = Y , Z1 = Z[, 1], Z2 = Z[, 2], Z3 = Z[, 3], X = X)
-glm1 <- glm(Y ~ Z1 + Z2 + Z3, data = df %>% filter(X == 0))
-m00 <- predict(glm1, newdata = df)
-cbind(m00, m0)
 

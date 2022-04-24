@@ -12,3 +12,4 @@
 # View(res_all)
 
 save(res_all, file = "res_all.RData")
+write.csv(res_all,"res_all.csv", row.names = FALSE)
